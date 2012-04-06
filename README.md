@@ -14,6 +14,6 @@ Author
 
 Depends on the following libraries/projects
 -------------------------------------------
-   commons-logging-1.1.jar
-   log4j-1.2.8.jar
-   ws_tools-0.3.7.jar developed by weiﬂ&schmidt, http://www.wsdevel.de
+* commons-logging-1.1.jar
+* log4j-1.2.8.jar
+* saw_java-tools-0.1.0.jar, http://dawnofmusic.github.com/SAW_JavaTools
