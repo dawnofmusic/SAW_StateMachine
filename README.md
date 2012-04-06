@@ -2,6 +2,8 @@ SAW State Machine
 =================
 About this project
 ------------------
+A state machine framework written entirely in Java. Very slim and easy to use.
+
 This project has been developed using the Eclipse IDE (http://www.eclipse.org).
 
 Programming Language: Java (JavaSE-1.6)
