@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!-- ======================================================================= -->
-<!-- Java__StateMachine build file                                            -->
+<!-- SAW_StateMachine build file                                            -->
 <!-- ======================================================================= -->
-<project name="Java__StateMachine" default="buildjar" basedir=".">
+<project name="SAW_StateMachine" default="buildjar" basedir=".">
 
 	<property file="build.properties" />
 
@@ -15,7 +15,7 @@
 	<property name="build.jar.dir" value="${basedir}/build/jar" />
 	<property name="build.log.dir" value="${basedir}/build/log" />
 	<property name="manifest.file" value="MANIFEST.MF" />
-	<property name="jar.file" value="ws_statemachine-${version}.jar" />
+	<property name="jar.file" value="saw_statemachine-${version}.jar" />
 
 	<!-- Build classpath -->
 	<path id="classpath">
