@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
 
 import de.wsdevel.tools.commands.CommandWithThrowable;
 import de.wsdevel.tools.common.interfaces.Named;
@@ -40,7 +41,7 @@ public class StateMachine extends NamedImpl implements Named {
 	/**
 	 * {@link StateMachineHandler} handler for errors.
 	 */
-	private StateMachineHandler handler;
+	private final StateMachineHandler handler;
 
 	/**
 	 * {@link State} the initial state.
@@ -52,15 +53,19 @@ public class StateMachine extends NamedImpl implements Named {
 	 */
 	private Timer stateMachineThread;
 
+	/** {@link ExecutorService} The executorService. */
+	private final ExecutorService executorService;
+
 	/**
 	 * {@link HashMap<String,State>} COMMENT.
 	 */
-	private HashMap<String, State> states = new HashMap<String, State>();
+	private final HashMap<String, State> states = new HashMap<String, State>();
 
 	/**
 	 * Default constructor.
 	 */
 	public StateMachine() {
+		this("", new SimpleLogStateMachineHandler());
 	}
 
 	/**
@@ -71,8 +76,23 @@ public class StateMachine extends NamedImpl implements Named {
 	 */
 	public StateMachine(final String nameVal,
 			final StateMachineHandler handlerRef) {
+		this(nameVal, handlerRef, null);
+	}
+
+	/**
+	 * @param nameVal
+	 *            {@link String} name of this instance.
+	 * @param handlerRef
+	 *            {@link StateMachineHandler}
+	 */
+	public StateMachine(final String nameVal,
+			final StateMachineHandler handlerRef,
+			final ExecutorService executorServiceRef) {
 		setName(nameVal);
-		this.stateMachineThread = new Timer(nameVal + "-THREAD", false);
+		this.executorService = executorServiceRef;
+		if (this.executorService == null) {
+			this.stateMachineThread = new Timer(nameVal + "-THREAD", false);
+		}
 		this.handler = handlerRef;
 	}
 
@@ -128,31 +148,79 @@ public class StateMachine extends NamedImpl implements Named {
 	 */
 	public final void tryTransition(final String transitionName,
 			final Object[] parameters) {
-		this.stateMachineThread.schedule(new TimerTask() {
+		final TimerTask task = new TimerTask() {
+			/**
+			 * COMMENT.
+			 * 
+			 * @param state
+			 *            {@link State}
+			 */
+			private void enterState(final State state) {
+				StateMachine.this.handler.tryToEnterState(StateMachine.this,
+						state);
+				StateMachine.this.currentState = state;
+				final CommandWithThrowable entryCommand = state
+						.getEntryCommand();
+				if (entryCommand != null) {
+					try {
+						entryCommand.run();
+					} catch (final Throwable e1) {
+						StateMachine.this.handler.entryFailed(
+								StateMachine.this, state);
+					}
+				}
+				StateMachine.this.handler
+						.enteredState(StateMachine.this, state);
+			}
+
+			/**
+			 * COMMENT.
+			 * 
+			 * @param state
+			 *            {@link State}
+			 */
+			private void exitState(final State state) {
+				StateMachine.this.handler.tryToExitState(StateMachine.this,
+						state);
+				final CommandWithThrowable exitCommand = state.getExitCommand();
+				if (exitCommand != null) {
+					try {
+						exitCommand.run();
+					} catch (final Throwable e) {
+						StateMachine.this.handler.exitFailed(StateMachine.this,
+								state);
+					}
+				}
+				StateMachine.this.handler.exitedState(StateMachine.this, state);
+			}
+
+			/**
+			 * @see java.util.TimerTask#run()
+			 */
 			@Override
 			public final void run() {
 				if (StateMachine.this.currentState
 						.hasTransition(transitionName)) {
-					Transition trans = StateMachine.this.currentState
+					final Transition trans = StateMachine.this.currentState
 							.getTransition(transitionName);
 					StateMachine.this.handler.tryTransition(StateMachine.this,
 							transitionName);
 					synchronized (StateMachine.this.currentState) {
-						State oldState = StateMachine.this.currentState;
+						final State oldState = StateMachine.this.currentState;
 						exitState(oldState);
 						StateMachine.this.currentState = null;
-						TransitionCommand transitionCommand = trans
+						final TransitionCommand transitionCommand = trans
 								.getTransitionCommand();
 						if (transitionCommand != null) {
 							try {
 								transitionCommand.run(parameters);
-							} catch (Throwable e) {
+							} catch (final Throwable e) {
 								StateMachine.this.handler
 										.errorOccured(
 												StateMachine.this,
+												parameters,
 												"Error during transition: "
-														+ e
-																.getLocalizedMessage()
+														+ e.getLocalizedMessage()
 														+ " - Return to previous state ["
 														+ oldState.getName()
 														+ "]", e);
@@ -170,51 +238,13 @@ public class StateMachine extends NamedImpl implements Named {
 				}
 			}
 
-			/**
-			 * COMMENT.
-			 * 
-			 * @param state
-			 *            {@link State}
-			 */
-			private void exitState(final State state) {
-				StateMachine.this.handler.tryToExitState(StateMachine.this,
-						state);
-				CommandWithThrowable exitCommand = state.getExitCommand();
-				if (exitCommand != null) {
-					try {
-						exitCommand.run();
-					} catch (Throwable e) {
-						StateMachine.this.handler.exitFailed(StateMachine.this,
-								state);
-					}
-				}
-				StateMachine.this.handler.exitedState(StateMachine.this, state);
-			}
+		};
+		if (this.executorService != null) {
+			this.executorService.execute(task);
+		} else if (this.stateMachineThread != null) {
+			this.stateMachineThread.schedule(task, 0);
+		}
 
-			/**
-			 * COMMENT.
-			 * 
-			 * @param state
-			 *            {@link State}
-			 */
-			private void enterState(final State state) {
-				StateMachine.this.handler.tryToEnterState(StateMachine.this,
-						state);
-				StateMachine.this.currentState = state;
-				CommandWithThrowable entryCommand = state.getEntryCommand();
-				if (entryCommand != null) {
-					try {
-						entryCommand.run();
-					} catch (Throwable e1) {
-						StateMachine.this.handler.entryFailed(
-								StateMachine.this, state);
-					}
-				}
-				StateMachine.this.handler
-						.enteredState(StateMachine.this, state);
-			}
-
-		}, 0);
 	}
 
 }

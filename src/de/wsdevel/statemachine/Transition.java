@@ -12,10 +12,12 @@ import de.wsdevel.tools.common.interfaces.impl.NamedImpl;
  * 
  * @author <a href="mailto:sweiss@weissundschmidt.de">Sebastian A. Weiss - Weiss
  *         und Schmidt, Mediale Systeme GbR</a>
- * @version $Author: sweiss $ -- $Revision: 1.5 $ -- $Date: 2008-09-22 08:46:48 $
+ * @version $Author: sweiss $ -- $Revision: 1.5 $ -- $Date: 2008-09-22 08:46:48
+ *          $
  * 
  * <br>
- * (c) 2007, Weiss und Schmidt, Mediale Systeme GbR - All rights reserved.
+ *          (c) 2007, Weiss und Schmidt, Mediale Systeme GbR - All rights
+ *          reserved.
  * 
  */
 public class Transition extends NamedImpl implements Named {
@@ -111,7 +113,7 @@ public class Transition extends NamedImpl implements Named {
 }
 //
 // $Log: Transition.java,v $
-// Revision 1.5  2008-09-22 08:46:48  sweiss
+// Revision 1.5 2008-09-22 08:46:48 sweiss
 // first release
 //
 // Revision 1.4 2008-06-10 10:41:07 sweiss

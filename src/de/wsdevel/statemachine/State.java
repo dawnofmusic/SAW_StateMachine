@@ -16,10 +16,12 @@ import de.wsdevel.tools.common.interfaces.impl.NamedImpl;
  * 
  * @author <a href="mailto:sweiss@weissundschmidt.de">Sebastian A. Weiss - Weiss
  *         und Schmidt, Mediale Systeme GbR</a>
- * @version $Author: sweiss $ -- $Revision: 1.4 $ -- $Date: 2008-09-22 08:46:49 $
+ * @version $Author: sweiss $ -- $Revision: 1.4 $ -- $Date: 2008-09-22 08:46:49
+ *          $
  * 
  * <br>
- * (c) 2007, Weiss und Schmidt, Mediale Systeme GbR - All rights reserved.
+ *          (c) 2007, Weiss und Schmidt, Mediale Systeme GbR - All rights
+ *          reserved.
  * 
  */
 public class State extends NamedImpl implements Named {
@@ -42,7 +44,7 @@ public class State extends NamedImpl implements Named {
 	/**
 	 * {@link HashMap<String,Transition>} COMMENT.
 	 */
-	private HashMap<String, Transition> transitions = new HashMap<String, Transition>();
+	private final HashMap<String, Transition> transitions = new HashMap<String, Transition>();
 
 	/**
 	 * Default constructor.
@@ -110,8 +112,8 @@ public class State extends NamedImpl implements Named {
 	/**
 	 * @param transitionName
 	 *            {@link String}
-	 * @return <code>boolean</code> <code>true</code> if transition is valid
-	 *         for this state.
+	 * @return <code>boolean</code> <code>true</code> if transition is valid for
+	 *         this state.
 	 */
 	public boolean hasTransition(final String transitionName) {
 		return this.transitions.containsKey(transitionName);
@@ -144,7 +146,7 @@ public class State extends NamedImpl implements Named {
 }
 //
 // $Log: State.java,v $
-// Revision 1.4  2008-09-22 08:46:49  sweiss
+// Revision 1.4 2008-09-22 08:46:49 sweiss
 // first release
 //
 // Revision 1.3 2008-06-10 10:41:07 sweiss
