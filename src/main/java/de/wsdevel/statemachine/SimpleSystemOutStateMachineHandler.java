@@ -42,16 +42,17 @@ public class SimpleSystemOutStateMachineHandler implements StateMachineHandler {
     /**
      * @param statemachine
      *            {@link StateMachine}
+     * @param parameters
      * @param message
      *            {@link String}
      * @param t
      *            {@link Throwable}
      * @see de.wsdevel.statemachine.StateMachineHandler#errorOccured(de.wsdevel.statemachine.StateMachine,
-     *      java.lang.String, java.lang.Throwable)
+     *      java.lang.Object[], java.lang.String, java.lang.Throwable)
      */
     @Override
-    public void errorOccured(final StateMachine statemachine,
-	    final String message, final Throwable t) {
+    public void errorOccured(StateMachine statemachine, Object[] parameters,
+	    String message, Throwable t) {
 	System.err.println("Statemachine [" + statemachine.getName() + "]: "
 		+ message);
 	t.printStackTrace(System.err);

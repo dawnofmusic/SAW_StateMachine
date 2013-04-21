@@ -42,7 +42,7 @@ public class State extends NamedImpl implements Named {
 	/**
 	 * {@link HashMap<String,Transition>} COMMENT.
 	 */
-	private HashMap<String, Transition> transitions = new HashMap<String, Transition>();
+	private final HashMap<String, Transition> transitions = new HashMap<String, Transition>();
 
 	/**
 	 * Default constructor.
